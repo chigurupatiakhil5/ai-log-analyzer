@@ -16,3 +16,9 @@ node_modules/
 
 # Docker
 *.log
+
+# Stray root-level files (installed from wrong directory)
+/package.json
+/package-lock.json
+/postcss.config.js
+/tailwind.config.js
