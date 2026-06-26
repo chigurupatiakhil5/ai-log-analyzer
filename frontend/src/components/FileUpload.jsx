@@ -18,8 +18,8 @@ export default function FileUpload({ onSuccess }) {
     try {
       const result = await uploadLog(file)
       onSuccess(result, file)
-    } catch {
-      setError('Upload failed. Make sure the backend is running on port 8000.')
+    } catch (err) {
+      setError(`Upload failed: ${err.message}`)
     } finally {
       setLoading(false)
     }
