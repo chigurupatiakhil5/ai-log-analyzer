@@ -1,13 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import FileUpload from './components/FileUpload'
 import SpikeReport from './components/SpikeReport'
 import ChatBox from './components/ChatBox'
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 export default function App() {
   const [sessionId, setSessionId] = useState(null)
   const [spikeReport, setSpikeReport] = useState(null)
   const [fileName, setFileName] = useState('')
   const [chunkCount, setChunkCount] = useState(0)
+  const [backendReady, setBackendReady] = useState(false)
+
+  useEffect(() => {
+    const wake = async () => {
+      try {
+        await fetch(`${BASE_URL}/health`)
+        setBackendReady(true)
+      } catch {
+        setBackendReady(false)
+      }
+    }
+    wake()
+  }, [])
 
   function handleUploadSuccess(result, file) {
     setSessionId(result.session_id)
@@ -60,7 +75,16 @@ export default function App() {
 
       {/* Main content */}
       {!sessionId ? (
-        <div className="w-full flex items-center justify-center min-h-[calc(100vh-64px)] px-16">
+        <div className="w-full flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-16">
+          {!backendReady && (
+            <div
+              className="mb-4 px-4 py-2.5 rounded-xl text-xs flex items-center gap-2"
+              style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', color: 'rgba(167,139,250,0.7)' }}
+            >
+              <div className="w-3 h-3 rounded-full animate-spin flex-shrink-0" style={{ border: '1.5px solid rgba(167,139,250,0.2)', borderTopColor: '#a78bfa' }} />
+              Waking up backend — first load may take ~30 seconds…
+            </div>
+          )}
           <FileUpload onSuccess={handleUploadSuccess} />
         </div>
       ) : (
