@@ -1,10 +1,20 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.query import router as query_router
 from api.upload import router as upload_router
+from core.embedder import _get_model
 
-app = FastAPI(title="AI Log Analyzer", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _get_model()
+    yield
+
+
+app = FastAPI(title="AI Log Analyzer", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
