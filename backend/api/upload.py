@@ -35,5 +35,6 @@ async def upload_log(file: UploadFile = File(...)):
             "flagged": spike_report.flagged,
             "total_counts": spike_report.total_counts,
             "spikes": spike_report.spikes,
+            "sample_lines": spike_report.sample_lines,
         },
     }
