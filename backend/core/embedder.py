@@ -1,18 +1,17 @@
 from typing import Optional
 
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
-_model: Optional[SentenceTransformer] = None
+_model: Optional[TextEmbedding] = None
 
 
-def _get_model() -> SentenceTransformer:
+def _get_model() -> TextEmbedding:
     global _model
     if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        _model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
     return _model
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
     model = _get_model()
-    embeddings = model.encode(texts, show_progress_bar=False)
-    return embeddings.tolist()
+    return [e.tolist() for e in model.embed(texts)]
