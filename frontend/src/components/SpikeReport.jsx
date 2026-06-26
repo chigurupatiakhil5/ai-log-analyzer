@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const LEVELS = [
   {
     key: 'ERROR',
@@ -26,6 +28,8 @@ const LEVELS = [
 ]
 
 export default function SpikeReport({ report }) {
+  const [expanded, setExpanded] = useState(null)
+
   if (!report) return null
 
   const hasAny = LEVELS.some((l) => (report.total_counts[l.key] || 0) > 0)
@@ -58,31 +62,70 @@ export default function SpikeReport({ report }) {
           const count = report.total_counts[key] || 0
           const spiked = report.spikes?.some((s) => s.level === key)
           const active = count > 0
+          const lines = report.sample_lines?.[key] || []
+          const isOpen = expanded === key
 
           return (
-            <div
-              key={key}
-              className="rounded-xl px-4 py-3 flex items-center justify-between transition-all duration-200"
-              style={{
-                background: active ? bg : 'rgba(255,255,255,0.02)',
-                border: `1px solid ${active ? border : 'rgba(255,255,255,0.06)'}`,
-              }}
-            >
-              <div className="flex items-center gap-2">
+            <div key={key}>
+              <button
+                onClick={() => active && setExpanded(isOpen ? null : key)}
+                className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition-all duration-200 text-left"
+                style={{
+                  background: active ? bg : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${active ? border : 'rgba(255,255,255,0.06)'}`,
+                  cursor: active ? 'pointer' : 'default',
+                  borderBottomLeftRadius: isOpen ? 0 : undefined,
+                  borderBottomRightRadius: isOpen ? 0 : undefined,
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: active ? dot : 'rgba(255,255,255,0.15)' }}
+                  />
+                  <span className="text-xs font-medium" style={{ color: active ? color : 'rgba(255,255,255,0.2)' }}>
+                    {label}
+                  </span>
+                  {spiked && <span className="text-xs" style={{ color }}>↑</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-bold" style={{ color: active ? color : 'rgba(255,255,255,0.15)' }}>
+                    {count}
+                  </p>
+                  {active && (
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      {isOpen ? '▲' : '▼'}
+                    </span>
+                  )}
+                </div>
+              </button>
+
+              {isOpen && lines.length > 0 && (
                 <div
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: active ? dot : 'rgba(255,255,255,0.15)' }}
-                />
-                <span className="text-xs font-medium" style={{ color: active ? color : 'rgba(255,255,255,0.2)' }}>
-                  {label}
-                </span>
-                {spiked && (
-                  <span className="text-xs" style={{ color }}>↑</span>
-                )}
-              </div>
-              <p className="text-2xl font-bold" style={{ color: active ? color : 'rgba(255,255,255,0.15)' }}>
-                {count}
-              </p>
+                  className="rounded-b-xl px-3 py-2 space-y-1 overflow-y-auto"
+                  style={{
+                    background: 'rgba(0,0,0,0.25)',
+                    border: `1px solid ${border}`,
+                    borderTop: 'none',
+                    maxHeight: '180px',
+                  }}
+                >
+                  {lines.map((line, i) => (
+                    <p
+                      key={i}
+                      className="text-xs font-mono break-all leading-relaxed"
+                      style={{ color: 'rgba(255,255,255,0.5)' }}
+                    >
+                      {line}
+                    </p>
+                  ))}
+                  {count > lines.length && (
+                    <p className="text-xs pt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      +{count - lines.length} more — ask the AI for details
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )
         })}
