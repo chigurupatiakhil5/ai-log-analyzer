@@ -53,7 +53,7 @@ export default function SpikeReport({ report }) {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="flex flex-col gap-2">
         {LEVELS.map(({ key, label, color, bg, border, dot }) => {
           const count = report.total_counts[key] || 0
           const spiked = report.spikes?.some((s) => s.level === key)
@@ -62,27 +62,25 @@ export default function SpikeReport({ report }) {
           return (
             <div
               key={key}
-              className="rounded-2xl p-5 transition-all duration-200"
+              className="rounded-xl px-4 py-3 flex items-center justify-between transition-all duration-200"
               style={{
                 background: active ? bg : 'rgba(255,255,255,0.02)',
                 border: `1px solid ${active ? border : 'rgba(255,255,255,0.06)'}`,
               }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: active ? dot : 'rgba(255,255,255,0.15)' }}
-                  />
-                  <span className="text-xs font-medium" style={{ color: active ? color : 'rgba(255,255,255,0.2)' }}>
-                    {label}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: active ? dot : 'rgba(255,255,255,0.15)' }}
+                />
+                <span className="text-xs font-medium" style={{ color: active ? color : 'rgba(255,255,255,0.2)' }}>
+                  {label}
+                </span>
                 {spiked && (
-                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>↑</span>
+                  <span className="text-xs" style={{ color }}>↑</span>
                 )}
               </div>
-              <p className="text-3xl font-bold" style={{ color: active ? color : 'rgba(255,255,255,0.15)' }}>
+              <p className="text-2xl font-bold" style={{ color: active ? color : 'rgba(255,255,255,0.15)' }}>
                 {count}
               </p>
             </div>
